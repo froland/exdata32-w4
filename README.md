@@ -33,6 +33,20 @@ SCC <- readRDS("Source_Classification_Code.rds")
 Using the base plotting system, make a plot showing the total PM2.5
 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
 
+![Total PM2.5 emissions by year](plot1.png)
+
+```
+df <- NEI %>%
+  select(Emissions, year) %>%
+  mutate(year = factor(year, levels = c(1999, 2002, 2005, 2008), ordered = T)) %>%
+  group_by(year) %>%
+  summarise(total.emissions = sum(Emissions))
+
+plot(df$year, df$total.emissions,
+     ylab = "PM2.5 (tons)", main = "Total PM2.5 emissions by year")
+
+```
+
 **Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008?**
 
 Use the base plotting system to make a plot answering this question.

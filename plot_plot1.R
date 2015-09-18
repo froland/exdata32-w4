@@ -4,9 +4,5 @@ df <- NEI %>%
   group_by(year) %>%
   summarise(total.emissions = sum(Emissions))
 
-png("plot1.png")
-
 plot(df$year, df$total.emissions,
-     ylab = "PM2.5 (tons)", main = "Total PM2.5 emissions")
-
-dev.off()
+     ylab = "PM2.5 (tons)", main = "Total PM2.5 emissions by year")

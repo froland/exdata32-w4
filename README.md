@@ -44,16 +44,36 @@ df <- NEI %>%
 
 plot(df$year, df$total.emissions,
      ylab = "PM2.5 (tons)", main = "Total PM2.5 emissions by year")
-
 ```
+
+*We can see that total PM2.5 emissions actually decreased from 1999 to 2008.*
 
 **Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008?**
 
 Use the base plotting system to make a plot answering this question.
 
+![PM2.5 emissions by year in Baltimore City, Maryland](plot2.png)
+
+```
+df <- NEI %>%
+  filter(fips == "24510") %>%
+  select(Emissions, year) %>%
+  mutate(year = factor(year, levels = c(1999, 2002, 2005, 2008), ordered = T)) %>%
+  group_by(year) %>%
+  summarise(total.emissions = sum(Emissions))
+
+plot(df$year, df$total.emissions,
+     ylab = "PM2.5 (tons)")
+title(main = "PM2.5 emissions by year in\nBaltimore City, Maryland", cex.main = 0.9)
+```
+
+*From the plot, we can say that 2008 emissions in Baltimore City are lower than in 1999.*
+
 **Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008?**
 
 Use the ggplot2 plotting system to make a plot answer this question.
+
+
 
 **Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?**
 

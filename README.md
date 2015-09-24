@@ -26,6 +26,22 @@ NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 ```
 
+## Dataset comments
+
+No line from the NEI dataset contains NA values.
+
+```
+# Creates a dataframe without duplicated rows.
+uq.NEI <- unique(NEI)
+duplicate.count <- nrow(NEI) - nrow(uq.NEI)
+```
+
+There are 105106 duplicate rows in the NEI dataset. From information in
+[The 2008 National Emissions Inventory](http://www3.epa.gov/ttn/chief/net/2008inventory.html)
+website, we know that emissions come from emission estimates and models. So
+there shouldn't be any duplicate. That's why we'll remove duplicates from the
+NEI dataframe.
+
 ## Questions
 
 **Have total emissions from PM2.5 decreased in the United States from 1999 to 2008?**
@@ -52,7 +68,7 @@ plot(df$year, df$total.emissions,
 
 Use the base plotting system to make a plot answering this question.
 
-![PM2.5 emissions by year in Baltimore City, Maryland](plot2.png)
+![PM2.5 emissions by year in Baltimore](plot2.png)
 
 ```
 df <- NEI %>%
@@ -73,9 +89,56 @@ title(main = "PM2.5 emissions by year in\nBaltimore City, Maryland", cex.main = 
 
 Use the ggplot2 plotting system to make a plot answer this question.
 
+![PM2.5 emissions in Baltimore](plot3.png)
+
+```
+library(ggplot2)
+
+# Get the sum of Emissions in Baltimore
+balt <- NEI[NEI$fips == 24510,]
+balt$type <- factor(tolower(balt$type), c("point", "nonpoint", "on-road", "non-road"))
+
+p <- ggplot(balt, aes(as.factor(year), Emissions)) +
+  geom_bar(stat = "identity", aes(fill = type)) +
+  facet_grid(. ~ type) +
+  labs(x = "Year") +
+  labs(y = expression("PM"[2.5]*" (ton)")) +
+  labs(title = expression("PM"[2.5] * " emissions in Baltimore")) +
+  theme(legend.position="none")
+print(p)
+```
 
 
 **Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?**
+
+First challenge here is to determine what are the 'coal combustion-related 
+sources'.
+
+The interpretation I chose is all SCC rows where the EI.Sector contains both
+'Fuel Comb' and 'Coal' + those containing 'Coal' in either SCC.Level.Three or
+SCC.Level.Four. From those, I removed SCC related to Mining and Storage and
+Transport. Of course, other valid interpretations exist.
+
+![PM2.5 emissions related to coal combustion](plot4.png)
+
+```
+library(ggplot2)
+
+coal <- grep("Fuel Comb.*Coal", SCC$EI.Sector, ignore.case = T)
+coal <- union(coal, grep("Coal", SCC$SCC.Level.Four, ignore.case = T))
+coal <- union(coal, grep("Coal", SCC$SCC.Level.Three, ignore.case = T))
+coal <- setdiff(coal, grep("Storage and Transfer", SCC$EI.Sector, ignore.case = T))
+coal <- setdiff(coal, grep("Mining", SCC$EI.Sector, ignore.case = T))
+coal.SCC <- unique(SCC[coal, "SCC"])
+coal.NEI <- NEI[NEI$SCC %in% coal.SCC,]
+
+p <- ggplot(coal.NEI, aes(as.factor(year), Emissions)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Year") +
+  labs(y = expression("PM"[2.5] * " (ton)")) +
+  labs(title = expression("PM"[2.5] * " emissions related to coal combustion"))
+print(p)
+```
 
 **How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?**
 

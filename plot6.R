@@ -24,16 +24,25 @@ NEI <- readRDS(kNeiFilename)
 SCC <- readRDS(kSccFilename)
 NEI <- unique(NEI)
 
-png("plot2.png")
+png("plot6.png")
 
-# Get the sum of Emissions in Baltimore
-balt <- NEI[NEI$fips == 24510,]
-# Groups them by year and computes the total
-baltsum <- tapply(balt$Emissions, balt$year, sum)
+library(ggplot2)
 
-barplot(baltsum,
-        xlab = "Year",
-        ylab = expression("PM"[2.5]*" (ton)"),
-        main = expression("Sum of PM"[2.5] * " emissions in Baltimore City"))
+motor.NEI <- NEI[NEI$type %in% c("ON-ROAD", "NON-ROAD"),]
+baltimore <- motor.NEI[motor.NEI$fips == "24510",]
+baltimore$city <- "Baltimore City"
+losangeles <- motor.NEI[motor.NEI$fips == "06037",]
+losangeles$city <- "Los Angeles"
+both <- rbind(baltimore, losangeles)
+both$city <- factor(both$city, levels = c("Baltimore City", "Los Angeles"))
+
+p <- ggplot(both, aes(as.factor(year), Emissions)) +
+  geom_bar(stat = "identity", aes(fill = city)) +
+  labs(x = "Year") +
+  labs(y = expression("PM"[2.5] * " (ton)")) +
+  facet_grid(. ~ city) +
+  labs(title = expression("Motor vehicle PM"[2.5] * " emissions")) +
+  theme(legend.position="none")
+print(p)
 
 dev.off()

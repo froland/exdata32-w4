@@ -142,6 +142,22 @@ print(p)
 
 **How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?**
 
+![Motor vehicle PM2.5 emissions in Baltimore City](plot5.png)
+
+```
+library(ggplot2)
+
+motor.NEI <- NEI[NEI$type %in% c("ON-ROAD", "NON-ROAD"),]
+baltimore <- motor.NEI[motor.NEI$fips == "24510",]
+
+p <- ggplot(baltimore, aes(as.factor(year), Emissions)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Year") +
+  labs(y = expression("PM"[2.5] * " (ton)")) +
+  labs(title = expression("Motor vehicle PM"[2.5] * " emissions"))
+print(p)
+```
+
 **Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?**
 
 I translated "motor vehicle sources" to "ON-ROAD" and "NON-ROAD" values of the

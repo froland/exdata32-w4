@@ -68,7 +68,7 @@ plot(df$year, df$total.emissions,
 
 Use the base plotting system to make a plot answering this question.
 
-![PM2.5 emissions by year in Baltimore](plot2.png)
+![PM2.5 emissions by year in Baltimore City](plot2.png)
 
 ```
 df <- NEI %>%
@@ -80,7 +80,7 @@ df <- NEI %>%
 
 plot(df$year, df$total.emissions,
      ylab = "PM2.5 (tons)")
-title(main = "PM2.5 emissions by year in\nBaltimore City, Maryland", cex.main = 0.9)
+title(main = "PM2.5 emissions by year in\nBaltimore City", cex.main = 0.9)
 ```
 
 *From the plot, we can say that 2008 emissions in Baltimore City are lower than in 1999.*
@@ -89,7 +89,7 @@ title(main = "PM2.5 emissions by year in\nBaltimore City, Maryland", cex.main = 
 
 Use the ggplot2 plotting system to make a plot answer this question.
 
-![PM2.5 emissions in Baltimore](plot3.png)
+![PM2.5 emissions in Baltimore City](plot3.png)
 
 ```
 library(ggplot2)
@@ -103,7 +103,7 @@ p <- ggplot(balt, aes(as.factor(year), Emissions)) +
   facet_grid(. ~ type) +
   labs(x = "Year") +
   labs(y = expression("PM"[2.5]*" (ton)")) +
-  labs(title = expression("PM"[2.5] * " emissions in Baltimore")) +
+  labs(title = expression("PM"[2.5] * " emissions in Baltimore City")) +
   theme(legend.position="none")
 print(p)
 ```
@@ -143,5 +143,31 @@ print(p)
 **How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?**
 
 **Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?**
+
+I translated "motor vehicle sources" to "ON-ROAD" and "NON-ROAD" values of the
+"type" field.
+
+![Motor vehicle PM2.5 emissions](plot6.png)
+
+```
+library(ggplot2)
+
+motor.NEI <- NEI[NEI$type %in% c("ON-ROAD", "NON-ROAD"),]
+baltimore <- motor.NEI[motor.NEI$fips == "24510",]
+baltimore$city <- "Baltimore City"
+losangeles <- motor.NEI[motor.NEI$fips == "06037",]
+losangeles$city <- "Los Angeles"
+both <- rbind(baltimore, losangeles)
+both$city <- factor(both$city, levels = c("Baltimore City", "Los Angeles"))
+
+p <- ggplot(both, aes(as.factor(year), Emissions)) +
+  geom_bar(stat = "identity", aes(fill = city)) +
+  labs(x = "Year") +
+  labs(y = expression("PM"[2.5] * " (ton)")) +
+  facet_grid(. ~ city) +
+  labs(title = expression("Motor vehicle PM"[2.5] * " emissions")) +
+  theme(legend.position="none")
+print(p)
+```
 
 [1]: https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip "National Emissions Inventory"

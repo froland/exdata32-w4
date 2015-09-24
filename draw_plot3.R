@@ -9,6 +9,6 @@ p <- ggplot(balt, aes(as.factor(year), Emissions)) +
   facet_grid(. ~ type) +
   labs(x = "Year") +
   labs(y = expression("PM"[2.5]*" (ton)")) +
-  labs(title = expression("PM"[2.5] * " emissions in Baltimore")) +
+  labs(title = expression("PM"[2.5] * " emissions in Baltimore City")) +
   theme(legend.position="none")
 print(p)

@@ -6,4 +6,4 @@ baltsum <- tapply(balt$Emissions, balt$year, sum)
 barplot(baltsum,
         xlab = "Year",
         ylab = expression("PM"[2.5]*" (ton)"),
-        main = expression("Sum of PM"[2.5] * " emissions in Baltimore"))
+        main = expression("Sum of PM"[2.5] * " emissions in Baltimore City"))
